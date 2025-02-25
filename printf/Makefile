@@ -1,49 +1,47 @@
-# Variables
-CFILES =	ft_printf.c \
-			ft_printf_cases.c \
+# 🏗️ Variables de fichiers
+SRC = ft_printf.c ft_printf_cases.c
+OBJ = $(SRC:.c=.o)
 
-OFILES = $(CFILES:%.c=%.o)
+# 📌 Chemin vers libft
 LIBFT_PATH = ../
-LIBFT = $(LIBFT_PATH)/libft.a
+LIBFT = $(LIBFT_PATH)/libftx.a
 
-# Compiler + flags
+# ⚙️ Compiler + flags
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-# Targets
-NAME = printf.a
-TEST_EXEC = libftprintf
 
-# Default Rule
+# 📦 Nom de la bibliothèque finale
+NAME = printf.a
+
+# 🎯 Règle par défaut : construire la lib
 all: $(NAME)
 
-# Create the Static Library
- $(NAME): $(OFILES) $(LIBFT)  ft_printf.h
-	cp $(LIBFT) $(NAME)
-	ar rcs $(NAME) $(OFILES)
+# 🏛️ Création de la bibliothèque statique
+$(NAME): $(OBJ) $(LIBFT)
+	ar rcs $(NAME) $(OBJ) $(LIBFT)
 
-# Build object files
+# 📌 Compilation des fichiers `.c` en `.o`
 %.o: %.c ft_printf.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Build the Test Executable
-$(TEST_EXEC): $(NAME) main.c 
-	$(CC) $(CFLAGS) main.c $(NAME) -o $(TEST_EXEC)
+# 🧪 Exécutable de test
+TEST_EXEC = test_printf
+$(TEST_EXEC): $(OBJ) main.c $(LIBFT)
+	$(CC) $(CFLAGS) main.c $(OBJ) $(LIBFT) -o $(TEST_EXEC)
 
-# Clean Object Files
+# 🧹 Nettoyage des fichiers objets
 clean:
-	rm -f $(OFILES)
-	$(MAKE) -C $(LIBFT_PATH) clean
+	rm -f $(OBJ)
 
-# Clean All Build Artifacts
+# 🧼 Nettoyage total
 fclean: clean
-	rm -f $(NAME) $(TEST_EXEC)
-	$(MAKE) -C $(LIBFT_PATH) fclean || true
+	rm -f $(NAME) $(TEST_EXEC) $(OBJ)
 
+# 🔄 Rebuild propre
 re: fclean all
 
-# ensure libft is built before linking
+# ⚠️ S'assurer que `libft` est bien construite avant `printf.a`
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_PATH) all
-	$(MAKE) -C $(LIBFT_PATH) clean
 
 .PHONY: all clean fclean re

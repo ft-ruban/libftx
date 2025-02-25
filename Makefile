@@ -57,10 +57,14 @@ CFILES = 	ft_atoi.c\
 			ft_tolower.c \
 			ft_toupper.c \
 			ft_utoa.c \
+			printf/ft_printf.c \
+			printf/ft_printf_cases.c\
+			get_next_line/get_next_line.c\
 
 #SRC?
+OBJ = $(CFILES:.c=.o)
 HEADERS		=	$(DGNL)/get_next_line.h\
-				$(DPRINTF)/ft_printf.h\
+				$(DPRINTF)/ft_printf.h
 
 #####################################################
 #					ARCHIVES						#
@@ -70,24 +74,36 @@ AR				=	ar
 AFLAG			=	rcs
 LIBPRINTF		=	$(DPRINTF)/printf.a
 
-all : $(LIBPRINTF) $(NAME)
+
+#####################################################
+#                   TARGETS                         #
+#####################################################
+all: $(NAME)
+
+$(NAME): $(OBJ)
+	$(AR) $(AFLAG) $(NAME) $(OBJ)
 
 $(LIBPRINTF):
 	$(MAKE) -C $(DPRINTF)
 
-$(NAME): $(HEADERS) Makefile $(SRC)
-	$(CC) $(CFLAGS) $(SRC) $(LIBPRINTF)
+#rules to create objects files
+%.o: %.c $(HEADERS)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-re: fclean
-	$(MAKE) all
+# Clean objects and gen files
+clean:
+	rm -f $(OBJ)
+	$(MAKE) -C $(DPRINTF) clean || true
 
-fclean: clean 
+# Fclean  (complete clean)
+fclean: clean
 	rm -f $(NAME)
-	$(MAKE) clean -C $(DPRINTF)
+	$(MAKE) -C $(DPRINTF) clean || true
 
-clean: 
-	$(MAKE) clean -C $(DPRINTF)
+#rebuild
+re: fclean all
 
+.PHONY: all clean fclean re
 #OFILES = $(CFILES:%.c=%.o)
 
 #all: $(NAME)
